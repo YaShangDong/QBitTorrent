@@ -10,6 +10,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
+use YaSD\QBitTorrent\Exception\UnauthorizedException;
 
 class RequestBuilder
 {
@@ -22,14 +23,10 @@ class RequestBuilder
         int $port,
         protected UriFactoryInterface $uriFactory,
         protected RequestFactoryInterface $requestFactory,
-        protected StreamFactoryInterface $streamFactory
+        protected StreamFactoryInterface $streamFactory,
+        protected Client $client
     ) {
         $this->uri = $this->uriFactory->createUri('')->withHost($host)->withPort($port);
-    }
-
-    public function getUri(): UriInterface
-    {
-        return $this->uri;
     }
 
     public function setMethod(string $method): static
@@ -38,10 +35,24 @@ class RequestBuilder
         return $this;
     }
 
-    public function setUri(?string $uri): static
+    public function setUri(string $uri): static
     {
         $this->uri = $this->uri->withPath($uri);
         return $this;
+    }
+
+    public function addCookie(): static
+    {
+        if (empty($this->client->getCookieSID())) {
+            throw UnauthorizedException::forCookie();
+        }
+        return $this->addHeader('Cookie', sprintf('SID=%s', $this->client->getCookieSID()));
+    }
+
+    public function addReferer(): static
+    {
+        // Set Referer or Origin header to the exact same domain and port as used in the HTTP query Host header.
+        return $this->addHeader('Referer', (string) $this->uri->withPath(''));
     }
 
     /**
