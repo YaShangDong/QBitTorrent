@@ -10,6 +10,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use YaSD\QBitTorrent\Exception\InvalidArgumentException;
 use YaSD\QBitTorrent\Exception\LoginFailedException;
+use YaSD\QBitTorrent\Exception\NotFoundException;
 use YaSD\QBitTorrent\Exception\TooManyFailedLoginException;
 use YaSD\QBitTorrent\Exception\UnauthorizedException;
 use YaSD\QBitTorrent\Exception\UnexpectedResponseException;
@@ -229,6 +230,44 @@ class qBitTorrent
     public function logGetPeers(int $last_known_id = -1): array
     {
         $api = new Log\LogGetPeers($last_known_id);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Sync: Get main data.
+     *
+     * @param int $rid Response ID. If not provided, `rid=0` will be assumed. If the given `rid` is different from the one of last server reply, `full_update` will be `true`
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return array JSON
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-main-data
+     */
+    public function syncGetData(int $rid = 0): array
+    {
+        $api = new Sync\SyncGetData($rid);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Sync: Get torrent peers data.
+     *
+     * @param string $hash Torrent hash
+     * @param int    $rid  Response ID. If not provided, `rid=0` will be assumed. If the given `rid` is different from the one of last server reply, `full_update` will be `true`
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           torrent hash was not found
+     *
+     * @return array JSON
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-peers-data
+     */
+    public function syncGetPeers(string $hash, int $rid = 0): array
+    {
+        $api = new Sync\SyncGetPeers($hash, $rid);
         return $this->client->execute($api);
     }
 }

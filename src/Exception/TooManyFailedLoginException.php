@@ -8,7 +8,7 @@ use RuntimeException;
 use Throwable;
 use YaSD\QBitTorrent\Exception;
 
-class tooManyFailedLoginException extends RuntimeException implements Exception
+class TooManyFailedLoginException extends RuntimeException implements Exception
 {
     public static function fromLogin(?Throwable $previous = null): static
     {
