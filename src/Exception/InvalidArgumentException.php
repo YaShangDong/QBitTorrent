@@ -51,4 +51,10 @@ class InvalidArgumentException extends RuntimeException implements Exception
         $msg = sprintf('Invalid_Category_Name: %s', $categoryName);
         return new static($msg, 0, $previous);
     }
+
+    public static function fromTorrentSetFilePrio(?Throwable $previous = null): static
+    {
+        $msg = 'Invalid_Argument: Priority is invalid, or, At least one file id is not a valid integer';
+        return new static($msg, 0, $previous);
+    }
 }
