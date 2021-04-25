@@ -57,4 +57,10 @@ class InvalidArgumentException extends RuntimeException implements Exception
         $msg = 'Invalid_Argument: Priority is invalid, or, At least one file id is not a valid integer';
         return new static($msg, 0, $previous);
     }
+
+    public static function forSavePath(string $location, ?Throwable $previous = null): static
+    {
+        $msg = sprintf('Invalid_Save_Path: %s', $location);
+        return new static($msg, 0, $previous);
+    }
 }
