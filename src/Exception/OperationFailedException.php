@@ -46,12 +46,6 @@ class OperationFailedException extends RuntimeException implements Exception
         return new static($msg, 0, $previous);
     }
 
-    public static function fromTorrentRemoveTrackers409(?Throwable $previous = null): static
-    {
-        $msg = 'Operation_Failed: all trackers urls were not found';
-        return new static($msg, 0, $previous);
-    }
-
     public static function forTorrentPriority(?Throwable $previous = null): static
     {
         $msg = 'Operation_Failed: torrent queueing is not enabled';
@@ -61,6 +55,12 @@ class OperationFailedException extends RuntimeException implements Exception
     public static function fromTorrentAdd415(?Throwable $previous = null): static
     {
         $msg = 'Torrent_Add_Failed: torrent file is not valid';
+        return new static($msg, 0, $previous);
+    }
+
+    public static function forCode409(string $msg, ?Throwable $previous = null): static
+    {
+        $msg = sprintf('Operation_Failed: %s', $msg);
         return new static($msg, 0, $previous);
     }
 }

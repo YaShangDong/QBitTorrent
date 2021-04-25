@@ -45,4 +45,10 @@ class InvalidArgumentException extends RuntimeException implements Exception
         $msg = sprintf('Invalid_Search_Results_Offset: %d', $offset);
         return new static($msg, 0, $previous);
     }
+
+    public static function forInvalidCategory(string $categoryName, ?Throwable $previous = null): static
+    {
+        $msg = sprintf('Invalid_Category_Name: %s', $categoryName);
+        return new static($msg, 0, $previous);
+    }
 }

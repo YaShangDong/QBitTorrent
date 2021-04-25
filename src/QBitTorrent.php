@@ -841,4 +841,137 @@ class qBitTorrent
         $this->client->execute($api);
         return $this;
     }
+
+    /**
+     * Category: Add new category.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws InvalidArgumentException    Category name is invalid
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#add-new-category
+     */
+    public function categoryCreate(string $category, string $savePath): static
+    {
+        $api = new Torrent\CategoryCreate($category, $savePath);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Category: Edit category.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws InvalidArgumentException    Category name is empty
+     * @throws OperationFailedException    Category editing failed
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#edit-category
+     */
+    public function categoryEdit(
+        string $category,
+        string $savePath,
+    ): static {
+        $api = new Torrent\CategoryEdit(
+            $category,
+            $savePath
+        );
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Category: Remove categories.
+     *
+     * @param string $categories categories can contain multiple cateogies separated by `\n` (`%0A` urlencoded)
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#remove-categories
+     */
+    public function categoryRemove(string $categories): static
+    {
+        $api = new Torrent\CategoryRemove($categories);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Category: Get all categories.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return array Returns all categories in JSON format
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-all-categories
+     */
+    public function categoryList(): array
+    {
+        $api = new Torrent\CategoryList();
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Tag: Get all tags.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return array Returns all tags in JSON format
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-all-tags
+     */
+    public function tagList(): array
+    {
+        $api = new Torrent\TagList();
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Tag: Create tags.
+     *
+     * @param string|string[] $tagNames
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#create-tags
+     */
+    public function tagCreate(string | array $tagNames): static
+    {
+        $tags = \is_array($tagNames) ? implode(',', $tagNames) : $tagNames;
+        $api = new Torrent\TagCreate($tags);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Tag: Delete tags.
+     *
+     * @param string|string[] $tagNames
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#delete-tags
+     */
+    public function tagDelete(string | array $tagNames): static
+    {
+        $tags = \is_array($tagNames) ? implode(',', $tagNames) : $tagNames;
+        $api = new Torrent\TagDelete($tags);
+        $this->client->execute($api);
+        return $this;
+    }
 }
