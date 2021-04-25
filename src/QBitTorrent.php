@@ -507,4 +507,197 @@ class qBitTorrent
         $api = new Rss\RssMatchRule($ruleName);
         return $this->client->execute($api);
     }
+
+    /**
+     * Search: start search job.
+     *
+     * @param string $pattern  Pattern to search for (e.g. "Ubuntu 18.04")
+     * @param string $plugins  Plugins to use for searching (e.g. "legittorrents"). Supports multiple plugins separated by |. Also supports all and enabled
+     * @param string $category Categories to limit your search to (e.g. "legittorrents"). Available categories depend on the specified plugins. Also supports all
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws OperationFailedException    user has reached the limit of max running searches (currently set to 5)
+     *
+     * @return array JSON
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#start-search
+     */
+    public function searchStartJob(string $pattern, string $plugins, string $category): array
+    {
+        $api = new Search\SearchStartJob($pattern, $plugins, $category);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Search: stop search job.
+     *
+     * @param int $id ID of the search job
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           search job was not found
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#stop-search
+     */
+    public function searchStopJob(int $id): static
+    {
+        $api = new Search\SearchStopJob($id);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Search: get search job status.
+     *
+     * @param null|int $id ID of the search job. If not specified, all search jobs are returned
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           search job was not found
+     *
+     * @return array JSON
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-search-status
+     */
+    public function searchGetJobsStatus(int $id = null): array
+    {
+        $api = new Search\SearchGetJobsStatus($id);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Search: get search job results.
+     *
+     * @param int $id     ID of the search job
+     * @param int $limit  max number of results to return. 0 or negative means no limit
+     * @param int $offset result to start at. A negative number means count backwards (e.g. -2 returns the 2 most recent results)
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           search job was not found
+     * @throws InvalidArgumentException    offset is too large, or too small (e.g. absolute value of negative number is greater than # results)
+     *
+     * @return array JSON
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-search-results
+     */
+    public function searchGetJobsResults(int $id, int $limit = null, int $offset = null): array
+    {
+        $api = new Search\SearchGetJobsResults($id, $limit, $offset);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Search: delete search job.
+     *
+     * @param int $id ID of the search job
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           search job was not found
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#delete-search
+     */
+    public function searchDeleteJob(int $id): static
+    {
+        $api = new Search\SearchDeleteJob($id);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Search: get all search plugins.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return array JSON
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-search-plugins
+     */
+    public function searchGetAllPlugins(): array
+    {
+        $api = new Search\SearchGetAllPlugins();
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Search: install search plugin.
+     *
+     * @param string $sources Url or file path of the plugin to install (e.g. "https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/legittorrents.py"). Supports multiple sources separated by |
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#install-search-plugin
+     */
+    public function searchInstallPlugin(string $sources): static
+    {
+        $api = new Search\SearchInstallPlugin($sources);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Search: uninstall search plugin.
+     *
+     * @param string $names Name of the plugin to uninstall (e.g. "legittorrents"). Supports multiple names separated by |
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#uninstall-search-plugin
+     */
+    public function searchUninstallPlugin(string $names): static
+    {
+        $api = new Search\SearchUninstallPlugin($names);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Search: enable search plugin.
+     *
+     * @param string $names  Name of the plugin to enable/disable (e.g. "legittorrents"). Supports multiple names separated by |
+     * @param bool   $enable Whether the plugins should be enabled
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#enable-search-plugin
+     */
+    public function searchEnablePlugin(string $names, bool $enable): static
+    {
+        $api = new Search\SearchEnablePlugin($names, $enable);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Search: update search plugins.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#update-search-plugins
+     */
+    public function searchUpdatePlugins(): static
+    {
+        $api = new Search\SearchUpdatePlugins();
+        $this->client->execute($api);
+        return $this;
+    }
 }
