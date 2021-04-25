@@ -700,4 +700,145 @@ class qBitTorrent
         $this->client->execute($api);
         return $this;
     }
+
+    /**
+     * Transfer: Get global transfer info.
+     *
+     * This method returns info you usually see in qBt status bar
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return array JSON
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-global-transfer-info
+     */
+    public function transferGetInfo(): array
+    {
+        $api = new Transfer\TransferGetInfo();
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Transfer: Get alternative speed limits state.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return int 1 if alternative speed limits are enabled, 0 otherwise
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-alternative-speed-limits-state
+     */
+    public function transferGetMode(): int
+    {
+        $api = new Transfer\TransferGetMode();
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Transfer: Toggle alternative speed limits.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#toggle-alternative-speed-limits
+     */
+    public function transferToggleMode(): static
+    {
+        $api = new Transfer\TransferToggleMode();
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Transfer: Get global download limit.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return int the value of current global download speed limit in bytes/second; this value will be zero if no limit is applied
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-global-download-limit
+     */
+    public function transferGetDownloadLimit(): int
+    {
+        $api = new Transfer\TransferGetDownloadLimit();
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Transfer: Set global download limit.
+     *
+     * @param int $limit The global download speed limit to set in bytes/second
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-global-download-limit
+     */
+    public function transferSetDownloadLimit(int $limit): static
+    {
+        $api = new Transfer\TransferSetDownloadLimit($limit);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Transfer: Get global upload limit.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return int current global upload speed limit in bytes/second; this value will be zero if no limit is applied
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-global-upload-limit
+     */
+    public function transferGetUploadLimit(): int
+    {
+        $api = new Transfer\TransferGetUploadLimit();
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Transfer: Set global upload limit.
+     *
+     * @param int $limit The global upload speed limit to set in bytes/second
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-global-upload-limit
+     */
+    public function transferSetUploadLimit(int $limit): static
+    {
+        $api = new Transfer\TransferSetUploadLimit($limit);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Transfer: Ban peers.
+     *
+     * @param string|string[] $peers The peers to ban, Each peer is a colon-separated host:port
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#ban-peers
+     */
+    public function transferBanPeers(string | array $peers): static
+    {
+        $peers = \is_array($peers) ? implode('|', $peers) : $peers;
+        $api = new Transfer\TransferBanPeers($peers);
+        $this->client->execute($api);
+        return $this;
+    }
 }
