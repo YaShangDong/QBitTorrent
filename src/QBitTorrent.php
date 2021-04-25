@@ -186,4 +186,49 @@ class qBitTorrent
         $this->client->execute($api);
         return $this;
     }
+
+    /**
+     * Get logs.
+     *
+     * @param bool $normal        Include normal messages
+     * @param bool $info          Include info messages
+     * @param bool $warning       Include warning messages
+     * @param bool $critical      Include critical messages
+     * @param int  $last_known_id Exclude messages with "message id" <= last_known_id
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return array JSON array in which each element is an entry of the log
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-log
+     */
+    public function logGetLogs(
+        bool $normal = true,
+        bool $info = true,
+        bool $warning = true,
+        bool $critical = true,
+        int $last_known_id = -1
+    ): array {
+        $api = new Log\LogGetLogs($normal, $info, $warning, $critical, $last_known_id);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Get peer log.
+     *
+     * @param int $last_known_id Exclude messages with "message id" <= last_known_id
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return array JSON
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-peer-log
+     */
+    public function logGetPeers(int $last_known_id = -1): array
+    {
+        $api = new Log\LogGetPeers($last_known_id);
+        return $this->client->execute($api);
+    }
 }
