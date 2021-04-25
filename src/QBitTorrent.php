@@ -11,6 +11,7 @@ use Psr\Http\Message\UriFactoryInterface;
 use YaSD\QBitTorrent\Exception\InvalidArgumentException;
 use YaSD\QBitTorrent\Exception\LoginFailedException;
 use YaSD\QBitTorrent\Exception\NotFoundException;
+use YaSD\QBitTorrent\Exception\OperationFailedException;
 use YaSD\QBitTorrent\Exception\TooManyFailedLoginException;
 use YaSD\QBitTorrent\Exception\UnauthorizedException;
 use YaSD\QBitTorrent\Exception\UnexpectedResponseException;
@@ -268,6 +269,242 @@ class qBitTorrent
     public function syncGetPeers(string $hash, int $rid = 0): array
     {
         $api = new Sync\SyncGetPeers($hash, $rid);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * RSS: Get all items.
+     *
+     * @param bool $withData True if you need current feed articles
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return array JSON
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-all-items
+     */
+    public function rssGetAllItems(bool $withData = false): array
+    {
+        $api = new Rss\RssGetAllItems($withData);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * RSS: Add feed.
+     *
+     * @param string      $url  URL of RSS feed (e.g. "http://thepiratebay.org/rss//top100/200")
+     * @param null|string $path Full path of added folder (e.g. "The Pirate Bay\Top100\Video")
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws OperationFailedException    failure to add feed
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#add-feed
+     */
+    public function rssAddFeed(string $url, string $path = null): static
+    {
+        $api = new Rss\RssAddFeed($url, $path);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * RSS: Add folder.
+     *
+     * @param string $path full path of added folder (e.g. "The Pirate Bay\Top100")
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws OperationFailedException    failure to add folder
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#add-folder
+     */
+    public function rssAddFolder(string $path): static
+    {
+        $api = new Rss\RssAddFolder($path);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * RSS: Mark article/feed as read.
+     *
+     * If $articleId is provided only the article is marked as read otherwise the whole feed is going to be marked as read.
+     *
+     * @param string      $itemPath  Current full path of item (e.g. "The Pirate Bay\Top100")
+     * @param null|string $articleId ID of article
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#mark-as-read
+     */
+    public function rssMarkItemAsRead(string $itemPath, string $articleId = null): static
+    {
+        $api = new Rss\RssMarkItemAsRead($itemPath, $articleId);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * RSS: Moves/renames folder or feed.
+     *
+     * @param string $itemPath Current full path of item (e.g. "The Pirate Bay\Top100")
+     * @param string $destPath New full path of item (e.g. "The Pirate Bay")
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws OperationFailedException    failure to move item
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#move-item
+     */
+    public function rssMoveItem(string $itemPath, string $destPath): static
+    {
+        $api = new Rss\RssMoveItem($itemPath, $destPath);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * RSS: Refresh folder or feed.
+     *
+     * @param string $itemPath Current full path of item (e.g. "The Pirate Bay\Top100")
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#refresh-item
+     */
+    public function rssRefreshItem(string $itemPath): static
+    {
+        $api = new Rss\RssRefreshItem($itemPath);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * RSS: Removes folder or feed.
+     *
+     * @param string $path Full path of removed item (e.g. "The Pirate Bay\Top100")
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws OperationFailedException    failure to remove item
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#remove-item
+     */
+    public function rssRemoveItem(string $path): static
+    {
+        $api = new Rss\RssRemoveItem($path);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * RSS: Get all auto-downloading rules.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return array all auto-downloading rules in JSON format
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-all-auto-downloading-rules
+     */
+    public function rssGetAllRules(): array
+    {
+        $api = new Rss\RssGetAllRules();
+        return $this->client->execute($api);
+    }
+
+    /**
+     * RSS: Set auto-downloading rule.
+     *
+     * @todo validate rule json syntax
+     *
+     * @param string $ruleName Rule name (e.g. "Punisher")
+     * @param string $ruleDef  JSON encoded rule definition
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-auto-downloading-rule
+     */
+    public function rssSetRule(string $ruleName, string $ruleDef): static
+    {
+        $api = new Rss\RssSetRule($ruleName, $ruleDef);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * RSS: Remove auto-downloading rule.
+     *
+     * @param string $ruleName Rule name (e.g. "Punisher")
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#remove-auto-downloading-rule
+     */
+    public function rssRemoveRule(string $ruleName): static
+    {
+        $api = new Rss\RssRemoveRule($ruleName);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * RSS: Rename auto-downloading rule.
+     *
+     * @param string $ruleName    Rule name (e.g. "Punisher")
+     * @param string $newRuleName New rule name (e.g. "The Punisher")
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#rename-auto-downloading-rule
+     */
+    public function rssRenameRule(string $ruleName, string $newRuleName): static
+    {
+        $api = new Rss\RssRenameRule($ruleName, $newRuleName);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * RSS: Get all articles matching a rule.
+     *
+     * @param string $ruleName Rule name (e.g. "Linux")
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return array all articles that match a rule by feed name in JSON format
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-all-articles-matching-a-rule
+     */
+    public function rssMatchRule(string $ruleName): array
+    {
+        $api = new Rss\RssMatchRule($ruleName);
         return $this->client->execute($api);
     }
 }
