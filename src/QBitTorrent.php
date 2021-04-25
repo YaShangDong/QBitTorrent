@@ -872,14 +872,9 @@ class qBitTorrent
      *
      * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#edit-category
      */
-    public function categoryEdit(
-        string $category,
-        string $savePath,
-    ): static {
-        $api = new Torrent\CategoryEdit(
-            $category,
-            $savePath
-        );
+    public function categoryEdit(string $category, string $savePath): static
+    {
+        $api = new Torrent\CategoryEdit($category, $savePath);
         $this->client->execute($api);
         return $this;
     }
@@ -971,6 +966,884 @@ class qBitTorrent
     {
         $tags = \is_array($tagNames) ? implode(',', $tagNames) : $tagNames;
         $api = new Torrent\TagDelete($tags);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Get torrent list.
+     *
+     * @param null|string $filter   Filter torrent list by state. Allowed state filters: `all`, `downloading`, `completed`, `paused`, `active`, `inactive`, `resumed`, `stalled`, `stalled_uploading`, `stalled_downloading`
+     * @param null|string $category Get torrents with the given category (empty string means "without category"; no "category" parameter means "any category". Remember to URL-encode the category name. For example, `My category` becomes `My%20category`
+     * @param null|string $sort     Sort torrents by given key. They can be sorted using any field of the response's JSON array (which are documented below) as the sort key.
+     * @param null|bool   $reverse  Enable reverse sorting. Defaults to `false`
+     * @param null|int    $limit    Limit the number of torrents returned
+     * @param null|int    $offset   Set offset (if less than 0, offset from end)
+     * @param null|string $hashes   Filter by hashes. Can contain multiple hashes separated by `|`
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return array JSON
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-list
+     */
+    public function torrentList(
+        string $filter = null,
+        string $category = null,
+        string $sort = null,
+        bool $reverse = null,
+        int $limit = null,
+        int $offset = null,
+        string $hashes = null,
+    ): array {
+        if ($category) {
+            // Remember to URL-encode the category name. For example, `My category` becomes `My%20category`
+            $category = urlencode(urldecode($category));
+        }
+        $api = new Torrent\TorrentList($filter, $category, $sort, $reverse, $limit, $offset, $hashes);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Torrent: Get torrent generic properties.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           Torrent hash was not found
+     *
+     * @return array JSON
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-generic-properties
+     */
+    public function torrentGetProperties(string $hash): array
+    {
+        $api = new Torrent\TorrentGetProperties($hash);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Torrent: Get torrent trackers.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           Torrent hash was not found
+     *
+     * @return array JSON array, where each element contains info about one tracker
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-trackers
+     */
+    public function torrentGetTrackers(string $hash): array
+    {
+        $api = new Torrent\TorrentGetTrackers($hash);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Torrent: Get torrent web seeds.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           Torrent hash was not found
+     *
+     * @return array a JSON array, where each element is information about one webseed
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-web-seeds
+     */
+    public function torrentGetWebSeeds(string $hash): array
+    {
+        $api = new Torrent\TorrentGetWebSeeds($hash);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Torrent: Get torrent contents.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           Torrent hash was not found
+     *
+     * @return array JSON array, where each element contains info about one file
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-contents
+     */
+    public function torrentGetContents(string $hash): array
+    {
+        $api = new Torrent\TorrentGetContents($hash);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Torrent: Get torrent pieces' states.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           Torrent hash was not found
+     *
+     * @return array an array of states (integers) of all pieces (in order) of a specific torrent
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-pieces-states
+     */
+    public function torrentGetPiecesStates(string $hash): array
+    {
+        $api = new Torrent\TorrentGetPiecesStates($hash);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Torrent: Get torrent pieces' hashes.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           Torrent hash was not found
+     *
+     * @return array an array of hashes (strings) of all pieces (in order) of a specific torrent
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-pieces-hashes
+     */
+    public function torrentGetPiecesHashes(string $hash): array
+    {
+        $api = new Torrent\TorrentGetPiecesHashes($hash);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Torrent: Pause torrents.
+     *
+     * @param string $hashes The hashes of the torrents you want to pause. hashes can contain multiple hashes separated by `|`, to pause multiple torrents, or set to `all`, to pause all torrents.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#pause-torrents
+     */
+    public function torrentPause(string $hashes): static
+    {
+        $api = new Torrent\TorrentPause($hashes);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Resume torrents.
+     *
+     * @param string $hashes The hashes of the torrents you want to resume. hashes can contain multiple hashes separated by `|`, to resume multiple torrents, or set to `all`, to resume all torrents.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#resume-torrents
+     */
+    public function torrentResume(string $hashes): static
+    {
+        $api = new Torrent\TorrentResume($hashes);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Delete torrents.
+     *
+     * @param string $hashes      The hashes of the torrents you want to delete. hashes can contain multiple hashes separated by `|`, to delete multiple torrents, or set to `all`, to delete all torrents.
+     * @param bool   $deleteFiles if set to `true`, the downloaded data will also be deleted, otherwise has no effect
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#delete-torrents
+     */
+    public function torrentDelete(string $hashes, bool $deleteFiles = false): static
+    {
+        $api = new Torrent\TorrentDelete($hashes, $deleteFiles);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Recheck torrents.
+     *
+     * @param string $hashes The hashes of the torrents you want to recheck. hashes can contain multiple hashes separated by `|`, to recheck multiple torrents, or set to `all`, to recheck all torrents.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#recheck-torrents
+     */
+    public function torrentRecheck(string $hashes): static
+    {
+        $api = new Torrent\TorrentRecheck($hashes);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Reannounce torrents.
+     *
+     * @param string $hashes The hashes of the torrents you want to reannounce. hashes can contain multiple hashes separated by `|`, to reannounce multiple torrents, or set to `all`, to reannounce all torrents.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#reannounce-torrents
+     */
+    public function torrentReannounce(string $hashes): static
+    {
+        $api = new Torrent\TorrentReannounce($hashes);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Add trackers to torrent.
+     *
+     * @param string|string[] $urls tracker urls
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           Torrent hash was not found
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#add-trackers-to-torrent
+     */
+    public function torrentAddTrackers(string $hash, string | array $urls): static
+    {
+        $urls = \is_array($urls) ? implode('%0A', $urls) : $urls;
+        $api = new Torrent\TorrentAddTrackers($hash, $urls);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Edit trackers.
+     *
+     * @param string $hash    The hash of the torrent
+     * @param string $origUrl The tracker URL you want to edit
+     * @param string $newUrl  The new URL to replace the origUrl
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           Torrent hash was not found
+     * @throws InvalidArgumentException    newUrl is not a valid URL
+     * @throws OperationFailedException    newUrl already exists for the torrent
+     * @throws OperationFailedException    origUrl was not found
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#edit-trackers
+     */
+    public function torrentEditTracker(string $hash, string $origUrl, string $newUrl): static
+    {
+        $api = new Torrent\TorrentEditTracker($hash, $origUrl, $newUrl);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Remove trackers.
+     *
+     * @param string $hash The hash of the torrent
+     * @param string $urls URLs to remove, separated by `|`
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           Torrent hash was not found
+     * @throws OperationFailedException    All urls were not found
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#remove-trackers
+     */
+    public function torrentRemoveTrackers(string $hash, string $urls): static
+    {
+        $api = new Torrent\TorrentRemoveTrackers($hash, $urls);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Add peers.
+     *
+     * @param string $hashes The hash of the torrent, or multiple hashes separated by a pipe `|`
+     * @param string $peers  The peer to add, or multiple peers separated by a pipe `|`. Each peer is a colon-separated `host:port`
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws InvalidArgumentException    None of the supplied peers are valid
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#add-peers
+     */
+    public function torrentAddPeers(string $hashes, string $peers): static
+    {
+        $api = new Torrent\TorrentAddPeers($hashes, $peers);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Increase torrent priority.
+     *
+     * @param string $hashes The hashes of the torrents you want to increase the priority of. hashes can contain multiple hashes separated by `|`, to increase the priority of multiple torrents, or set to `all`, to increase the priority of all torrents.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws OperationFailedException    Torrent queueing is not enabled
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#increase-torrent-priority
+     */
+    public function torrentIncreasePriority(string $hashes): static
+    {
+        $api = new Torrent\TorrentIncreasePriority($hashes);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Decrease torrent priority.
+     *
+     * @param string $hashes The hashes of the torrents you want to decrease the priority of. hashes can contain multiple hashes separated by `|`, to decrease the priority of multiple torrents, or set to `all`, to decrease the priority of all torrents.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws OperationFailedException    Torrent queueing is not enabled
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#decrease-torrent-priority
+     */
+    public function torrentDecreasePriority(string $hashes): static
+    {
+        $api = new Torrent\TorrentDecreasePriority($hashes);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Maximal torrent priority.
+     *
+     * @param string $hashes The hashes of the torrents you want to set to the maximum priority. hashes can contain multiple hashes separated by `|`, to set multiple torrents to the maximum priority, or set to `all`, to set all torrents to the maximum priority.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws OperationFailedException    Torrent queueing is not enabled
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#maximal-torrent-priority
+     */
+    public function torrentMaximalPriority(string $hashes): static
+    {
+        $api = new Torrent\TorrentMaximalPriority($hashes);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Minimal torrent priority.
+     *
+     * @param string $hashes The hashes of the torrents you want to set to the minimum priority. hashes can contain multiple hashes separated by |, to set multiple torrents to the minimum priority, or set to all, to set all torrents to the minimum priority.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws OperationFailedException    Torrent queueing is not enabled
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#minimal-torrent-priority
+     */
+    public function torrentMinimalPriority(string $hashes): static
+    {
+        $api = new Torrent\TorrentMinimalPriority($hashes);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Set file priority.
+     *
+     * @param string $hash     The hash of the torrent
+     * @param string $id       File ids, separated by `|`. `id` values coresspond to contents returned by torrent contents API, e.g. `id=0` for first file, `id=1` for second file, etc.
+     * @param int    $priority File priority to set. Please consult the torrent contents API for possible `priority` values.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           Torrent hash was not found
+     * @throws OperationFailedException    Torrent metadata hasn't downloaded yet
+     * @throws OperationFailedException    At least one file id was not found
+     * @throws InvalidArgumentException    Priority is invalid
+     * @throws InvalidArgumentException    At least one file id is not a valid integer
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-file-priority
+     */
+    public function torrentSetFilePrio(string $hash, string $id, int $priority): static
+    {
+        $api = new Torrent\TorrentSetFilePrio($hash, $id, $priority);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Get torrent download limit.
+     *
+     * @param string $hashes hashes can contain multiple hashes separated by `|` or set to `all`
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return array JSON
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-download-limit
+     */
+    public function torrentGetDownloadLimit(string $hashes): array
+    {
+        $api = new Torrent\TorrentGetDownloadLimit($hashes);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Torrent: Set torrent download limit.
+     *
+     * @param string $hashes hashes can contain multiple hashes separated by `|` or set to `all`
+     * @param int    $limit  limit is the download speed limit in bytes per second you want to set
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-torrent-download-limit
+     */
+    public function torrentSetDownloadLimit(string $hashes, int $limit): static
+    {
+        $api = new Torrent\TorrentSetDownloadLimit($hashes, $limit);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Set torrent share limit.
+     *
+     * @param string $hashes           hashes can contain multiple hashes separated by `|` or set to `all`
+     * @param float  $ratioLimit       ratioLimit is the max ratio the torrent should be seeded until. `-2` means the global limit should be used, `-1` means no limit.
+     * @param int    $seedingTimeLimit seedingTimeLimit is the max amount of time the torrent should be seeded. `-2` means the global limit should be used, `-1` means no limit.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-torrent-share-limit
+     */
+    public function torrentSetShareLimit(string $hashes, float $ratioLimit, int $seedingTimeLimit): static
+    {
+        $api = new Torrent\TorrentSetShareLimit($hashes, $ratioLimit, $seedingTimeLimit);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Get torrent upload limit.
+     *
+     * @param string $hashes hashes can contain multiple hashes separated by `|` or set to `all`
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-upload-limit
+     */
+    public function torrentGetUploadLimit(string $hashes): array
+    {
+        $api = new Torrent\TorrentGetUploadLimit($hashes);
+        return $this->client->execute($api);
+    }
+
+    /**
+     * Torrent: Set torrent upload limit.
+     *
+     * @param string $hashes hashes can contain multiple hashes separated by `|` or set to `all`
+     * @param int    $limit  limit is the upload speed limit in bytes per second you want to set
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-torrent-upload-limit
+     */
+    public function torrentSetUploadLimit(string $hashes, int $limit): static
+    {
+        $api = new Torrent\TorrentSetUploadLimit($hashes, $limit);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Set torrent location.
+     *
+     * @param string $hashes   hashes can contain multiple hashes separated by `|` or set to `all`
+     * @param string $location location is the location to download the torrent to. If the location doesn't exist, the torrent's location is unchanged.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws InvalidArgumentException    Save path is empty
+     * @throws OperationFailedException    Unable to create save path directory
+     * @throws OperationFailedException    User does not have write access to directory
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-torrent-location
+     */
+    public function torrentSetLocation(string $hashes, string $location): static
+    {
+        $api = new Torrent\TorrentSetLocation($hashes, $location);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Set torrent name.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           Torrent hash is invalid
+     * @throws InvalidArgumentException    Torrent name is empty
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-torrent-name
+     */
+    public function torrentRename(string $hash, string $name): static
+    {
+        $api = new Torrent\TorrentRename($hash, $name);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Set torrent category.
+     *
+     * @param string $hashes   hashes can contain multiple hashes separated by `|` or set to `all`
+     * @param string $category category is the torrent category you want to set
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws OperationFailedException    Category name does not exist
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-torrent-category
+     */
+    public function torrentSetCategory(string $hashes, string $category): static
+    {
+        $api = new Torrent\TorrentSetCategory($hashes, $category);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Add torrent tags.
+     *
+     * @param string $hashes hashes can contain multiple hashes separated by `|` or set to `all`
+     * @param string $tags   tags is the list of tags you want to add to passed torrents
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#add-torrent-tags
+     */
+    public function torrentAddTags(string $hashes, string $tags): static
+    {
+        $api = new Torrent\TorrentAddTags($hashes, $tags);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Remove torrent tags.
+     *
+     * @param string $hashes hashes can contain multiple hashes separated by `|` or set to `all`
+     * @param string $tags   tags is the list of tags you want to remove from passed torrents. Empty list removes all tags from relevant torrents.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#remove-torrent-tags
+     */
+    public function torrentRemoveTags(string $hashes, string $tags): static
+    {
+        $api = new Torrent\TorrentRemoveTags($hashes, $tags);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Set automatic torrent management.
+     *
+     * @param string $hashes hashes can contain multiple hashes separated by `|` or set to `all`
+     * @param bool   $enable enable is a boolean, affects the torrents listed in hashes, default is `false`
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-automatic-torrent-management
+     */
+    public function torrentSetAutoManagement(string $hashes, bool $enable): static
+    {
+        $api = new Torrent\TorrentSetAutoManagement($hashes, $enable);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Toggle sequential download.
+     *
+     * @param string $hashes The hashes of the torrents you want to toggle sequential download for. hashes can contain multiple hashes separated by `|`, to toggle sequential download for multiple torrents, or set to `all`, to toggle sequential download for all torrents.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#toggle-sequential-download
+     */
+    public function torrentToggleSequentialDownload(string $hashes): static
+    {
+        $api = new Torrent\TorrentToggleSequentialDownload($hashes);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Set first/last piece priority.
+     *
+     * @param string $hashes The hashes of the torrents you want to toggle the first/last piece priority for. hashes can contain multiple hashes separated by `|`, to toggle the first/last piece priority for multiple torrents, or set to `all`, to toggle the first/last piece priority for all torrents.
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-firstlast-piece-priority
+     */
+    public function torrentToggleFirstLastPiecePrio(string $hashes): static
+    {
+        $api = new Torrent\TorrentToggleFirstLastPiecePrio($hashes);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Set force start.
+     *
+     * @param string $hashes hashes can contain multiple hashes separated by `|` or set to `all`
+     * @param bool   $value  value is a boolean, affects the torrents listed in hashes, default is `false`
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-force-start
+     */
+    public function torrentSetForceStart(string $hashes, bool $value): static
+    {
+        $api = new Torrent\TorrentSetForceStart($hashes, $value);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Set super seeding.
+     *
+     * @param string $hashes hashes can contain multiple hashes separated by `|` or set to `all`
+     * @param bool   $value  value is a boolean, affects the torrents listed in hashes, default is false
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-super-seeding
+     */
+    public function torrentSetSuperSeeding(string $hashes, bool $value): static
+    {
+        $api = new Torrent\TorrentSetSuperSeeding($hashes, $value);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Rename file.
+     *
+     * @param string $hash    The hash of the torrent
+     * @param string $oldPath The old path of the torrent
+     * @param string $newPath The new path to use for the file
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           torrent hash was not found
+     * @throws OperationFailedException    Invalid newPath or oldPath, or newPath already in use
+     * @throws InvalidArgumentException    Missing newPath parameter
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#rename-file
+     */
+    public function torrentRenameFile(string $hash, string $oldPath, string $newPath): static
+    {
+        $api = new Torrent\TorrentRenameFile($hash, $oldPath, $newPath);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Rename folder.
+     *
+     * @param string $hash    The hash of the torrent
+     * @param string $oldPath The old path of the torrent
+     * @param string $newPath The new path to use for the file
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws NotFoundException           torrent hash was not found
+     * @throws OperationFailedException    Invalid newPath or oldPath, or newPath already in use
+     * @throws InvalidArgumentException    Missing newPath parameter
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#rename-folder
+     */
+    public function torrentRenameFolder(string $hash, string $oldPath, string $newPath): static
+    {
+        $api = new Torrent\TorrentRenameFolder($hash, $oldPath, $newPath);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Add new torrent from URLs.
+     *
+     *  `http://`, `https://`, `magnet:` and `bc://bt/` links are supported.
+     *
+     * @param array       $urls               URLs separated with newlines
+     * @param null|string $savepath           Download folder
+     * @param null|string $cookie             Cookie sent to download the .torrent file
+     * @param null|string $category           Category for the torrent
+     * @param null|string $tags               Tags for the torrent, split by ','
+     * @param null|string $skip_checking      Skip hash checking. Possible values are `true`, `false` (default)
+     * @param null|string $paused             Add torrents in the paused state. Possible values are `true`, `false` (default)
+     * @param null|string $root_folder        Create the root folder. Possible values are `true`, `false`, unset (default)
+     * @param null|string $rename             Rename torrent
+     * @param null|int    $upLimit            Set torrent upload speed limit. Unit in bytes/second
+     * @param null|int    $dlLimit            Set torrent download speed limit. Unit in bytes/second
+     * @param null|float  $ratioLimit         Set torrent share ratio limit
+     * @param null|int    $seedingTimeLimit   Set torrent seeding time limit. Unit in seconds
+     * @param null|bool   $autoTMM            Whether Automatic Torrent Management should be used
+     * @param null|string $sequentialDownload Enable sequential download. Possible values are `true`, `false` (default)
+     * @param null|string $firstLastPiecePrio Prioritize download first last piece. Possible values are `true`, `false` (default)
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws InvalidArgumentException    empty urls
+     * @throws OperationFailedException    Torrent file is not valid
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#add-new-torrent
+     */
+    public function torrentAddFromUrls(
+        array $urls,
+        string $savepath = null,
+        string $cookie = null,
+        string $category = null,
+        string $tags = null,
+        string $skip_checking = null,
+        string $paused = null,
+        string $root_folder = null,
+        string $rename = null,
+        int $upLimit = null,
+        int $dlLimit = null,
+        float $ratioLimit = null,
+        int $seedingTimeLimit = null,
+        bool $autoTMM = null,
+        string $sequentialDownload = null,
+        string $firstLastPiecePrio = null
+    ): static {
+        $api = Torrent\TorrentAdd::fromUrls($urls, $savepath, $cookie, $category, $tags, $skip_checking, $paused, $root_folder, $rename, $upLimit, $dlLimit, $ratioLimit, $seedingTimeLimit, $autoTMM, $sequentialDownload, $firstLastPiecePrio);
+        $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * Torrent: Add new torrent from files.
+     *
+     * @param array       $torrents           Raw data of torrent file. `torrents` can be presented multiple times.
+     * @param null|string $savepath           Download folder
+     * @param null|string $cookie             Cookie sent to download the .torrent file
+     * @param null|string $category           Category for the torrent
+     * @param null|string $tags               Tags for the torrent, split by ','
+     * @param null|string $skip_checking      Skip hash checking. Possible values are `true`, `false` (default)
+     * @param null|string $paused             Add torrents in the paused state. Possible values are `true`, `false` (default)
+     * @param null|string $root_folder        Create the root folder. Possible values are `true`, `false`, unset (default)
+     * @param null|string $rename             Rename torrent
+     * @param null|int    $upLimit            Set torrent upload speed limit. Unit in bytes/second
+     * @param null|int    $dlLimit            Set torrent download speed limit. Unit in bytes/second
+     * @param null|float  $ratioLimit         Set torrent share ratio limit
+     * @param null|int    $seedingTimeLimit   Set torrent seeding time limit. Unit in seconds
+     * @param null|bool   $autoTMM            Whether Automatic Torrent Management should be used
+     * @param null|string $sequentialDownload Enable sequential download. Possible values are `true`, `false` (default)
+     * @param null|string $firstLastPiecePrio Prioritize download first last piece. Possible values are `true`, `false` (default)
+     *
+     * @throws UnauthorizedException       unauthorized, login first
+     * @throws UnexpectedResponseException unexpected qBt response
+     * @throws InvalidArgumentException    empty torrents
+     * @throws OperationFailedException    Torrent file is not valid
+     *
+     * @return $this
+     *
+     * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#add-new-torrent
+     */
+    public function torrentAddFromTorrents(
+        array $torrents,
+        string $savepath = null,
+        string $cookie = null,
+        string $category = null,
+        string $tags = null,
+        string $skip_checking = null,
+        string $paused = null,
+        string $root_folder = null,
+        string $rename = null,
+        int $upLimit = null,
+        int $dlLimit = null,
+        float $ratioLimit = null,
+        int $seedingTimeLimit = null,
+        bool $autoTMM = null,
+        string $sequentialDownload = null,
+        string $firstLastPiecePrio = null
+    ): static {
+        $api = Torrent\TorrentAdd::fromTorrents($torrents, $savepath, $cookie, $category, $tags, $skip_checking, $paused, $root_folder, $rename, $upLimit, $dlLimit, $ratioLimit, $seedingTimeLimit, $autoTMM, $sequentialDownload, $firstLastPiecePrio);
         $this->client->execute($api);
         return $this;
     }
