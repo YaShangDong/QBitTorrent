@@ -16,7 +16,7 @@ use YaSD\QBitTorrent\Exception\TooManyFailedLoginException;
 use YaSD\QBitTorrent\Exception\UnauthorizedException;
 use YaSD\QBitTorrent\Exception\UnexpectedResponseException;
 
-class qBitTorrent
+class QBitTorrent
 {
     protected Client $client;
 
@@ -1393,7 +1393,7 @@ class qBitTorrent
      */
     public function torrentSetFilePrio(string $hash, string $id, int $priority): static
     {
-        $api = new Torrent\TorrentSetFilePrio($hash, $id, $priority);
+        $api = new Torrent\TorrentSetFilePriority($hash, $id, $priority);
         $this->client->execute($api);
         return $this;
     }

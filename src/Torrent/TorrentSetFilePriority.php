@@ -10,7 +10,7 @@ use YaSD\QBitTorrent\Exception\OperationFailedException;
 use YaSD\QBitTorrent\Traits\ResponseBody;
 use YaSD\QBitTorrent\Traits\ResponseCode;
 
-class TorrentSetFilePrio extends Torrent
+class TorrentSetFilePriority extends Torrent
 {
     use ResponseBody\DoNothing;
     use ResponseCode\Non200Codes;
