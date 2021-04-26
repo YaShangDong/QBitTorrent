@@ -26,7 +26,7 @@ class RequestBuilder
         protected StreamFactoryInterface $streamFactory,
         protected Client $client
     ) {
-        $this->uri = $this->uriFactory->createUri('')->withHost($host)->withPort($port);
+        $this->uri = $this->uriFactory->createUri('')->withScheme('http')->withHost($host)->withPort($port);
     }
 
     public function setMethod(string $method): static
