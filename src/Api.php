@@ -9,12 +9,13 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 
-abstract class API
+abstract class Api
 {
     public function buildRequest(Client $client): RequestInterface
     {
         $builder = $client->getRequestBuilder();
         $builder->setMethod('POST')->setUri($this->getUri());
+        $builder->addHeader('Content-Type', 'application/x-www-form-urlencoded');
         $builder = $this->setRequestHeaders($builder);
         $body = $this->buildRequestBody($client->getStreamFactory());
         return $builder->build($body);
