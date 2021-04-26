@@ -16,8 +16,8 @@ class SearchGetJobsResults extends Search
 
     public function __construct(
         protected int $id,
-        protected int $limit = null,
-        protected int $offset = null
+        protected ?int $limit = null,
+        protected ?int $offset = null
     ) {
     }
 

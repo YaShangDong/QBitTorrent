@@ -13,7 +13,7 @@ class RssGetAllItems extends Rss
     use ResponseCode\Code200;
 
     public function __construct(
-        protected bool $withData = null
+        protected ?bool $withData = null
     ) {
     }
 

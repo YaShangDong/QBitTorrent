@@ -14,7 +14,7 @@ class RssMarkItemAsRead extends Rss
 
     public function __construct(
         protected string $itemPath,
-        protected string $articleId = null
+        protected ?string $articleId = null
     ) {
     }
 

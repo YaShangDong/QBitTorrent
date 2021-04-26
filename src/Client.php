@@ -18,10 +18,10 @@ class Client
     public function __construct(
         protected string $host,
         protected int $port,
-        protected ClientInterface $httpClient = null,
-        protected UriFactoryInterface $uriFactory = null,
-        protected RequestFactoryInterface $requestFactory = null,
-        protected StreamFactoryInterface $streamFactory = null,
+        protected ?ClientInterface $httpClient = null,
+        protected ?UriFactoryInterface $uriFactory = null,
+        protected ?RequestFactoryInterface $requestFactory = null,
+        protected ?StreamFactoryInterface $streamFactory = null,
     ) {
         $this->httpClient = $httpClient ?: Psr18ClientDiscovery::find();
         $this->uriFactory = $uriFactory ?: Psr17FactoryDiscovery::findUriFactory();

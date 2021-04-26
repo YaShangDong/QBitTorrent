@@ -14,7 +14,7 @@ class SearchGetJobsStatus extends Search
     use ResponseCode\Non200Codes;
 
     public function __construct(
-        protected int $id = null
+        protected ?int $id = null
     ) {
     }
 

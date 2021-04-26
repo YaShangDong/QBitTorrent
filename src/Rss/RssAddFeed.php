@@ -15,7 +15,7 @@ class RssAddFeed extends Rss
 
     public function __construct(
         protected string $url,
-        protected string $path = null,
+        protected ?string $path = null,
     ) {
     }
 
