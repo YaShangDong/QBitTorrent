@@ -1747,22 +1747,22 @@ class QBitTorrent
      *
      *  `http://`, `https://`, `magnet:` and `bc://bt/` links are supported.
      *
-     * @param array       $urls               URLs separated with newlines
-     * @param null|string $savepath           Download folder
-     * @param null|string $cookie             Cookie sent to download the .torrent file
-     * @param null|string $category           Category for the torrent
-     * @param null|string $tags               Tags for the torrent, split by ','
-     * @param null|string $skip_checking      Skip hash checking. Possible values are `true`, `false` (default)
-     * @param null|string $paused             Add torrents in the paused state. Possible values are `true`, `false` (default)
-     * @param null|string $root_folder        Create the root folder. Possible values are `true`, `false`, unset (default)
-     * @param null|string $rename             Rename torrent
-     * @param null|int    $upLimit            Set torrent upload speed limit. Unit in bytes/second
-     * @param null|int    $dlLimit            Set torrent download speed limit. Unit in bytes/second
-     * @param null|float  $ratioLimit         Set torrent share ratio limit
-     * @param null|int    $seedingTimeLimit   Set torrent seeding time limit. Unit in seconds
-     * @param null|bool   $autoTMM            Whether Automatic Torrent Management should be used
-     * @param null|string $sequentialDownload Enable sequential download. Possible values are `true`, `false` (default)
-     * @param null|string $firstLastPiecePrio Prioritize download first last piece. Possible values are `true`, `false` (default)
+     * @param string|string[] $urls
+     * @param null|string     $savepath           Download folder
+     * @param null|string     $cookie             Cookie sent to download the .torrent file
+     * @param null|string     $category           Category for the torrent
+     * @param null|string     $tags               Tags for the torrent, split by ','
+     * @param null|string     $skip_checking      Skip hash checking. Possible values are `true`, `false` (default)
+     * @param null|string     $paused             Add torrents in the paused state. Possible values are `true`, `false` (default)
+     * @param null|string     $root_folder        Create the root folder. Possible values are `true`, `false`, unset (default)
+     * @param null|string     $rename             Rename torrent
+     * @param null|int        $upLimit            Set torrent upload speed limit. Unit in bytes/second
+     * @param null|int        $dlLimit            Set torrent download speed limit. Unit in bytes/second
+     * @param null|float      $ratioLimit         Set torrent share ratio limit
+     * @param null|int        $seedingTimeLimit   Set torrent seeding time limit. Unit in seconds
+     * @param null|bool       $autoTMM            Whether Automatic Torrent Management should be used
+     * @param null|string     $sequentialDownload Enable sequential download. Possible values are `true`, `false` (default)
+     * @param null|string     $firstLastPiecePrio Prioritize download first last piece. Possible values are `true`, `false` (default)
      *
      * @throws UnauthorizedException       unauthorized, login first
      * @throws UnexpectedResponseException unexpected qBt response
@@ -1774,7 +1774,7 @@ class QBitTorrent
      * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#add-new-torrent
      */
     public function torrentAddFromUrls(
-        array $urls,
+        string | array $urls,
         string $savepath = null,
         string $cookie = null,
         string $category = null,
@@ -1791,6 +1791,7 @@ class QBitTorrent
         string $sequentialDownload = null,
         string $firstLastPiecePrio = null
     ): static {
+        $urls = \is_array($urls) ?: [$urls];
         $api = Torrent\TorrentAdd::fromUrls($urls, $savepath, $cookie, $category, $tags, $skip_checking, $paused, $root_folder, $rename, $upLimit, $dlLimit, $ratioLimit, $seedingTimeLimit, $autoTMM, $sequentialDownload, $firstLastPiecePrio);
         $this->client->execute($api);
         return $this;
@@ -1799,22 +1800,22 @@ class QBitTorrent
     /**
      * Torrent: Add new torrent from files.
      *
-     * @param array       $torrents           Raw data of torrent file. `torrents` can be presented multiple times.
-     * @param null|string $savepath           Download folder
-     * @param null|string $cookie             Cookie sent to download the .torrent file
-     * @param null|string $category           Category for the torrent
-     * @param null|string $tags               Tags for the torrent, split by ','
-     * @param null|string $skip_checking      Skip hash checking. Possible values are `true`, `false` (default)
-     * @param null|string $paused             Add torrents in the paused state. Possible values are `true`, `false` (default)
-     * @param null|string $root_folder        Create the root folder. Possible values are `true`, `false`, unset (default)
-     * @param null|string $rename             Rename torrent
-     * @param null|int    $upLimit            Set torrent upload speed limit. Unit in bytes/second
-     * @param null|int    $dlLimit            Set torrent download speed limit. Unit in bytes/second
-     * @param null|float  $ratioLimit         Set torrent share ratio limit
-     * @param null|int    $seedingTimeLimit   Set torrent seeding time limit. Unit in seconds
-     * @param null|bool   $autoTMM            Whether Automatic Torrent Management should be used
-     * @param null|string $sequentialDownload Enable sequential download. Possible values are `true`, `false` (default)
-     * @param null|string $firstLastPiecePrio Prioritize download first last piece. Possible values are `true`, `false` (default)
+     * @param string|string[] $torrents           torrent file path
+     * @param null|string     $savepath           Download folder
+     * @param null|string     $cookie             Cookie sent to download the .torrent file
+     * @param null|string     $category           Category for the torrent
+     * @param null|string     $tags               Tags for the torrent, split by ','
+     * @param null|string     $skip_checking      Skip hash checking. Possible values are `true`, `false` (default)
+     * @param null|string     $paused             Add torrents in the paused state. Possible values are `true`, `false` (default)
+     * @param null|string     $root_folder        Create the root folder. Possible values are `true`, `false`, unset (default)
+     * @param null|string     $rename             Rename torrent
+     * @param null|int        $upLimit            Set torrent upload speed limit. Unit in bytes/second
+     * @param null|int        $dlLimit            Set torrent download speed limit. Unit in bytes/second
+     * @param null|float      $ratioLimit         Set torrent share ratio limit
+     * @param null|int        $seedingTimeLimit   Set torrent seeding time limit. Unit in seconds
+     * @param null|bool       $autoTMM            Whether Automatic Torrent Management should be used
+     * @param null|string     $sequentialDownload Enable sequential download. Possible values are `true`, `false` (default)
+     * @param null|string     $firstLastPiecePrio Prioritize download first last piece. Possible values are `true`, `false` (default)
      *
      * @throws UnauthorizedException       unauthorized, login first
      * @throws UnexpectedResponseException unexpected qBt response
@@ -1826,7 +1827,7 @@ class QBitTorrent
      * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#add-new-torrent
      */
     public function torrentAddFromTorrents(
-        array $torrents,
+        string | array $torrents,
         string $savepath = null,
         string $cookie = null,
         string $category = null,
@@ -1843,6 +1844,7 @@ class QBitTorrent
         string $sequentialDownload = null,
         string $firstLastPiecePrio = null
     ): static {
+        $torrents = \is_array($torrents) ?: [$torrents];
         $api = Torrent\TorrentAdd::fromTorrents($torrents, $savepath, $cookie, $category, $tags, $skip_checking, $paused, $root_folder, $rename, $upLimit, $dlLimit, $ratioLimit, $seedingTimeLimit, $autoTMM, $sequentialDownload, $firstLastPiecePrio);
         $this->client->execute($api);
         return $this;
