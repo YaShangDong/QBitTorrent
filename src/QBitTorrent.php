@@ -882,7 +882,7 @@ class QBitTorrent
     /**
      * Category: Remove categories.
      *
-     * @param string $categories categories can contain multiple cateogies separated by `\n` (`%0A` urlencoded)
+     * @param string|string[] $categories
      *
      * @throws UnauthorizedException       unauthorized, login first
      * @throws UnexpectedResponseException unexpected qBt response
@@ -891,8 +891,9 @@ class QBitTorrent
      *
      * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#remove-categories
      */
-    public function categoryRemove(string $categories): static
+    public function categoryRemove(string | array $categories): static
     {
+        $categories = \is_array($categories) ? implode("\n", $categories) : $categories;
         $api = new Torrent\CategoryRemove($categories);
         $this->client->execute($api);
         return $this;
@@ -1218,7 +1219,7 @@ class QBitTorrent
      */
     public function torrentAddTrackers(string $hash, string | array $urls): static
     {
-        $urls = \is_array($urls) ? implode('%0A', $urls) : $urls;
+        $urls = \is_array($urls) ? implode("\n", $urls) : $urls;
         $api = new Torrent\TorrentAddTrackers($hash, $urls);
         $this->client->execute($api);
         return $this;
