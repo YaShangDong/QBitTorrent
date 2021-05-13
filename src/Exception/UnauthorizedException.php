@@ -15,4 +15,10 @@ class UnauthorizedException extends RuntimeException implements Exception
         $msg = 'Unauthorized: no auth cookie, login first';
         return new static($msg, 0, $previous);
     }
+
+    public static function for403(?Throwable $previous = null): static
+    {
+        $msg = 'Unauthorized: 403, try login again';
+        return new static($msg, 0, $previous);
+    }
 }

@@ -23,6 +23,8 @@ class QBitTorrent
     public function __construct(
         string $host = 'localhost',
         int $port = 8080,
+        protected string $username = 'admin',
+        protected string $password = 'adminadmin',
         ClientInterface $httpClient = null,
         UriFactoryInterface $uriFactory = null,
         RequestFactoryInterface $requestFactory = null,
@@ -34,9 +36,6 @@ class QBitTorrent
     /**
      * Login.
      *
-     * @param string $username Username used to access the WebUI
-     * @param string $password Password used to access the WebUI
-     *
      * @throws LoginFailedException        login failed
      * @throws TooManyFailedLoginException User's IP is banned for too many failed login attempts
      * @throws UnexpectedResponseException unexpected qBt response
@@ -45,9 +44,9 @@ class QBitTorrent
      *
      * @see https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#login
      */
-    public function login(string $username = 'admin', string $password = 'adminadmin'): static
+    public function login(): static
     {
-        $api = new Auth\Login($username, $password);
+        $api = new Auth\Login($this->username, $this->password);
         $this->client->execute($api);
         return $this;
     }
@@ -66,6 +65,27 @@ class QBitTorrent
     {
         $api = new Auth\Logout();
         $this->client->execute($api);
+        return $this;
+    }
+
+    /**
+     * keep alive.
+     *
+     * if cookie expire, try login again to refresh cookie
+     *
+     * @throws LoginFailedException        login failed
+     * @throws TooManyFailedLoginException User's IP is banned for too many failed login attempts
+     * @throws UnexpectedResponseException unexpected qBt response
+     *
+     * @return $this
+     */
+    public function keepAlive(): static
+    {
+        try {
+            $this->apiGetVersion();
+        } catch (UnauthorizedException $e) {
+            $this->login();
+        }
         return $this;
     }
 
