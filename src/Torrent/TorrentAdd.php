@@ -113,13 +113,12 @@ class TorrentAdd extends Torrent
             if ('torrents' === $propName) {
                 foreach ($propValue as $torFilePath) {
                     $multipartBuilder
-                        ->addResource($propName, fopen($torFilePath, 'r'), ['filename' => basename($torFilePath)])
-                    ;
+                        ->addResource($propName, fopen($torFilePath, 'r'), ['filename' => basename($torFilePath)]);
                 }
             } elseif ('urls' === $propName) {
                 $multipartBuilder->addResource($propName, implode("\n", $propValue));
             } else {
-                $multipartBuilder->addResource($propName, $propValue);
+                $multipartBuilder->addResource($propName, (string) $propValue);
             }
         }
         $body = $multipartBuilder->build();
