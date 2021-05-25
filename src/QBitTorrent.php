@@ -1018,10 +1018,6 @@ class QBitTorrent
         int $offset = null,
         string $hashes = null,
     ): array {
-        if ($category) {
-            // Remember to URL-encode the category name. For example, `My category` becomes `My%20category`
-            $category = urlencode(urldecode($category));
-        }
         $api = new Torrent\TorrentList($filter, $category, $sort, $reverse, $limit, $offset, $hashes);
         return $this->client->execute($api);
     }
